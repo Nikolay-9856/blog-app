@@ -1,0 +1,2 @@
+{% extends 'base.html' %}
+{% block content %}<div class="panel"><h1>Ошибка {{ err.code }}</h1><p>{{ 'Доступ запрещён' if err.code==403 else 'Страница не найдена' }}</p></div>{% endblock %}

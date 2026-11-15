@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<article class="panel">
+  <div class="meta"><a href="{{ url_for('profile', username=post.username) }}">@{{ post.username }}</a>
+    · {{ post.created_at[:16] }}{% if post.updated_at %} · изменён {{ post.updated_at[:16] }}{% endif %}
+    · {{ visibility[post.visibility] }}</div>
+  <h1>{{ post.title }}</h1>
+  {% if readable %}
+    <div class="body">{{ post.body }}</div>
+    <div class="tags">{% for t in tags %}<a class="tag" href="{{ url_for('index', tag=t) }}">#{{ t }}</a>{% endfor %}</div>
+  {% else %}
+    <p class="muted">🔒 Автор открыл этот пост только по запросу.</p>
+    {% if not g.user %}<a class="btn" href="{{ url_for('login', next=request.path) }}">Войти, чтобы запросить доступ</a>
+    {% elif my_request %}<p>Статус вашего запроса: <b>{{ {'pending':'ожидает решения','approved':'одобрен','rejected':'отклонён'}[my_request.status] }}</b></p>
+    {% else %}<form method="post" action="{{ url_for('request_access', post_id=post.id) }}"><button class="btn">Запросить доступ</button></form>{% endif %}
+  {% endif %}
+  {% if g.user and g.user.id == post.author_id %}
+  <div class="actions">
+    <a class="btn ghost" href="{{ url_for('edit_post', post_id=post.id) }}">Редактировать</a>
+    <form method="post" action="{{ url_for('delete_post', post_id=post.id) }}" onsubmit="return confirm('Удалить пост?')"><button class="btn danger">Удалить</button></form>
+  </div>
+  {% endif %}
+</article>
+
+{% if requests_list %}
+<section class="panel">
+  <h3>Запросы на доступ</h3>
+  {% for r in requests_list %}
+  <div class="row">@{{ r.username }} — {{ {'pending':'ожидает','approved':'одобрен','rejected':'отклонён'}[r.status] }}
+    {% if r.status == 'pending' %}
+      <form method="post" action="{{ url_for('decide_request', req_id=r.id, decision='approved') }}"><button class="btn small">Одобрить</button></form>
+      <form method="post" action="{{ url_for('decide_request', req_id=r.id, decision='rejected') }}"><button class="btn small ghost">Отклонить</button></form>
+    {% endif %}
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% if readable %}
+<section class="panel" id="comments">
+  <h3>Комментарии ({{ comments|length }})</h3>
+  {% for c in comments %}
+  <div class="comment"><b>@{{ c.username }}</b> <span class="muted">{{ c.created_at[:16] }}</span>
+    {% if g.user and g.user.id in (c.author_id, post.author_id) %}
+    <form class="inline" method="post" action="{{ url_for('delete_comment', comment_id=c.id) }}"><button class="link">удалить</button></form>{% endif %}
+    <div>{{ c.text }}</div></div>
+  {% else %}<p class="muted">Комментариев пока нет.</p>{% endfor %}
+  {% if g.user %}
+  <form method="post" action="{{ url_for('add_comment', post_id=post.id) }}">
+    <textarea name="text" rows="3" required maxlength="2000" placeholder="Ваш комментарий"></textarea>
+    <button class="btn">Отправить</button>
+  </form>
+  {% else %}<p><a href="{{ url_for('login', next=request.path) }}">Войдите</a>, чтобы оставить комментарий.</p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

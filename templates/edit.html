@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Редактирование' if post else 'Новый пост' }}{% endblock %}
+{% block content %}
+<form method="post" class="panel">
+  <h1>{{ 'Редактирование поста' if post else 'Новый пост' }}</h1>
+  <label>Заголовок <input name="title" maxlength="200" required value="{{ post.title if post }}"></label>
+  <label>Текст <textarea name="body" rows="10" required>{{ post.body if post }}</textarea></label>
+  <label>Теги через запятую <input name="tags" value="{{ tags }}" placeholder="python, путешествия"></label>
+  <fieldset>
+    <legend>Видимость</legend>
+    {% for key, name in visibility.items() %}
+    <label class="inline"><input type="radio" name="visibility" value="{{ key }}"
+      {{ 'checked' if (post and post.visibility==key) or (not post and key=='public') }}> {{ name }}</label>
+    {% endfor %}
+  </fieldset>
+  <button class="btn">Сохранить</button>
+</form>
+{% endblock %}

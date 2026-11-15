@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1>{{ title }}{% if tag %} — #{{ tag }}{% endif %}</h1>
+{% if not is_feed %}
+<form class="toolbar" method="get">
+  <label>Сортировка
+    <select name="sort" onchange="this.form.submit()">
+      <option value="new" {{ 'selected' if sort=='new' }}>Сначала новые</option>
+      <option value="old" {{ 'selected' if sort=='old' }}>Сначала старые</option>
+      <option value="title" {{ 'selected' if sort=='title' }}>По заголовку</option>
+    </select>
+  </label>
+  {% if tag %}<input type="hidden" name="tag" value="{{ tag }}"><a href="{{ url_for('index', sort=sort) }}">сбросить тег</a>{% endif %}
+</form>
+<div class="tagcloud">
+  {% for t in all_tags %}<a class="tag {{ 'on' if t.name==tag }}" href="{{ url_for('index', tag=t.name, sort=sort) }}">#{{ t.name }} <small>{{ t.n }}</small></a>{% endfor %}
+</div>
+{% endif %}
+{% for p in posts %}{% include '_card.html' %}{% else %}
+<p class="muted">{% if is_feed %}Подпишитесь на авторов — их публикации появятся здесь.{% else %}Постов пока нет.{% endif %}</p>
+{% endfor %}
+{% endblock %}

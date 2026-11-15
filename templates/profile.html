@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}@{{ profile.username }}{% endblock %}
+{% block content %}
+<section class="panel profile">
+  <h1>@{{ profile.username }}</h1>
+  <p class="muted">Подписчиков: {{ followers }} · Подписок: {{ following }} · Постов: {{ posts|length }}</p>
+  {% if g.user and g.user.id != profile.id %}
+  <form method="post" action="{{ url_for('toggle_follow', username=profile.username) }}">
+    <button class="btn {{ 'ghost' if is_following }}">{{ 'Отписаться' if is_following else 'Подписаться' }}</button>
+  </form>
+  {% endif %}
+</section>
+{% for p in posts %}{% include '_card.html' %}{% else %}<p class="muted">Публикаций нет.</p>{% endfor %}
+{% endblock %}

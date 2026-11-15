@@ -1,0 +1,17 @@
+<article class="card">
+  <div class="meta">
+    <a href="{{ url_for('profile', username=p.username) }}">@{{ p.username }}</a>
+    · {{ p.created_at[:16] }}
+    {% if p.visibility == 'request' %}<span class="lock">🔒 по запросу</span>{% endif %}
+  </div>
+  <h2><a href="{{ url_for('view_post', post_id=p.id) }}">{{ p.title }}</a></h2>
+  {% if p.readable %}
+    <p>{{ p.body[:260] }}{% if p.body|length > 260 %}…{% endif %}</p>
+  {% else %}
+    <p class="muted">Содержимое скрыто автором. Откройте пост, чтобы запросить доступ.</p>
+  {% endif %}
+  <div class="tags">
+    {% for t in p.tags %}<a class="tag" href="{{ url_for('index', tag=t) }}">#{{ t }}</a>{% endfor %}
+    <span class="muted">💬 {{ p.comments }}</span>
+  </div>
+</article>

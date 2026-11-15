@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Вход' if mode=='login' else 'Регистрация' }}{% endblock %}
+{% block content %}
+<form method="post" class="panel narrow">
+  <h1>{{ 'Вход' if mode=='login' else 'Регистрация' }}</h1>
+  <label>Логин <input name="username" required minlength="3" maxlength="30"></label>
+  <label>Пароль <input name="password" type="password" required minlength="6"></label>
+  <button class="btn">{{ 'Войти' if mode=='login' else 'Создать аккаунт' }}</button>
+</form>
+{% endblock %}
